@@ -1,60 +1,65 @@
 import { Button, Grid, Typography } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useStyle from "./styles";
 import CallEndIcon from "@material-ui/icons/CallEnd";
 import PersonIcon from "@material-ui/icons/Person";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const Test = () => {
   const classes = useStyle();
-  const [users, setUsers] = useState([]);
   const [date, setDate] = useState(Date().toLocaleString());
   const [currentCard, setCurrentCard] = useState(null);
+  const users = useSelector(state => state.users);
+  const dispatch = useDispatch();
+  const max = 12;
+  const random = [];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDate(Date().toLocaleString());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [date]);
+
+  for (var i = 0; i < 12; i++) {
+    var temp = Math.floor(Math.random() * max);
+    if (random.indexOf(temp) == -1) {
+      random.push(temp);
+    } else i--;
+  }
+
   const handleAddUser = e => {
+    e.preventDefault();
     users.length < 12 &&
-      setUsers([
-        ...users,
-        {
-          id: Math.floor(Math.random() * 13),
-          title: Math.floor(Math.random() * 13),
-          order: Math.floor(Math.random() * 13)
-        }
-      ]);
+      dispatch({
+        type: "ADD",
+        payload: { id: random, title: random, order: random }
+      });
   };
 
   const dragStartHandler = (e, item) => {
-    console.log("Drag", item);
     setCurrentCard(item);
   };
 
   const dragOverHandler = e => {
     e.preventDefault();
-    e.target.style.background = "lighgray";
   };
 
-  const dragEndHandler = e => {
-    e.target.style.background = "white";
-  };
+  const dragEndHandler = e => {};
 
   const dropHandler = (e, item) => {
     e.preventDefault();
-    setUsers(
-      users.map(box => {
-        if (box.id === item.id) {
-          return { ...box, order: currentCard.order };
-        }
-        if (box.id === currentCard.id) {
-          return { ...box, order: item.order };
-        }
-        return box;
-      })
-    );
-    e.target.style.background = "white";
+    dispatch({
+      type: "DROP",
+      payload: { item, currentCard }
+    });
   };
 
   const sortBoxes = (a, b) => {
     if (a.order > b.order) {
       return 1;
-    } else {
+    } else if (a.order < b.order) {
       return -1;
     }
   };
@@ -76,11 +81,10 @@ const Test = () => {
               draggable
               onDragStart={e => dragStartHandler(e, item)}
               onDragLeave={e => dragEndHandler(e)}
-              onDragOver={e => dragOverHandler(e)}
               onDragEnd={e => dragEndHandler(e)}
+              onDragOver={e => dragOverHandler(e)}
               onDrop={e => dropHandler(e, item)}
               className={classes.userBox}
-              style={{ height: users.length <= 4 ? "300px" : "" }}
               key={item.id}
               {...{
                 lg:
@@ -88,11 +92,29 @@ const Test = () => {
                     ? 12 / 2
                     : users.length >= 4
                     ? 12 / 4
+                    : 12 / 3,
+                sm:
+                  users.length < 3
+                    ? 12 / 2
+                    : users.length >= 4
+                    ? 12 / 4
+                    : 12 / 3,
+                xs:
+                  users.length < 3
+                    ? 12 / 2
+                    : users.length >= 4
+                    ? 12 / 4
                     : 12 / 3
               }}
             >
-              <PersonIcon color="primary" style={{ fontSize: "100px" }} />
-              <Typography>{item.title}</Typography>
+              <div>
+                <Grid item>
+                  <PersonIcon color="primary" style={{ fontSize: "100px" }} />
+                </Grid>
+                <Grid item>
+                  <span style={{ fontSize: "12px" }}>{item.title}</span>
+                </Grid>
+              </div>
             </Grid>
           );
         })}

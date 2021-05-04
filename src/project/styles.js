@@ -27,7 +27,7 @@ export default makeStyles(theme => ({
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: "5px",
-    margin: "1px",
+    margin: "2px",
     cursor: "grab"
   },
   boxContainer: {
