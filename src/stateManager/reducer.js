@@ -1,5 +1,3 @@
-import { ListItemAvatar } from "@material-ui/core";
-
 const initialState = {
   users: []
 };

@@ -1,5 +1,5 @@
 import { Button, Grid, Typography } from "@material-ui/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useStyle from "./styles";
 import CallEndIcon from "@material-ui/icons/CallEnd";
 import PersonIcon from "@material-ui/icons/Person";
@@ -24,7 +24,7 @@ const Test = () => {
 
   for (var i = 0; i < 12; i++) {
     var temp = Math.floor(Math.random() * max);
-    if (random.indexOf(temp) == -1) {
+    if (random.indexOf(temp) === -1) {
       random.push(temp);
     } else i--;
   }
